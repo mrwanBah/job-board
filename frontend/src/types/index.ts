@@ -1,64 +1,70 @@
-// Core domain types for the Job Board frontend.
-// NOTE: API response shapes are provisional and must be reconciled with
-// Marwan's backend contract (Spring Boot). Treat anything below the domain
-// models as an assumption until the API is finalized. // CONFIRM W/ MARWAN
+// Domain types mirroring the backend DTOs (com.jobboard.dto / com.jobboard.model).
+// Kept in sync with the Spring Boot contract on `develop`.
 
-export type Role = 'APPLICANT' | 'COMPANY'
+export type Role = 'COMPANY' | 'APPLICANT' | 'ADMIN'
 
-export type JobType =
-  | 'FULL_TIME'
-  | 'PART_TIME'
-  | 'CONTRACT'
-  | 'INTERNSHIP'
-  | 'REMOTE'
+export type JobType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERNSHIP'
 
 export interface User {
-  id: string
+  id: number
   email: string
   fullName: string
   role: Role
 }
 
 export interface Company {
-  id: string
+  id: number
   name: string
-  description?: string
-  location?: string
-  website?: string
+  description?: string | null
+  website?: string | null
+  logoUrl?: string | null
+  location?: string | null
 }
 
 export interface Job {
-  id: string
+  id: number
   title: string
   description: string
-  company: Company
   location: string
   jobType: JobType
-  salaryMin?: number
-  salaryMax?: number
-  active: boolean
+  salaryMin?: number | null
+  salaryMax?: number | null
+  isActive: boolean
   createdAt: string
+  company: Company
 }
 
+// Mirrors dto/PageResponse<T> (page is 0-based).
+export interface PageResponse<T> {
+  content: T[]
+  page: number
+  size: number
+  totalElements: number
+  totalPages: number
+}
+
+// Query params accepted by GET /api/jobs.
 export interface JobFilters {
   search?: string
   jobType?: JobType
-  location?: string
   page?: number
-  pageSize?: number
+  size?: number
 }
 
-// Generic single-resource envelope. // CONFIRM W/ MARWAN
-export interface ApiResponse<T> {
-  data: T
-  message?: string
+// Auth payloads (mirror dto/LoginRequest, RegisterRequest, AuthResponse).
+export interface LoginRequest {
+  email: string
+  password: string
 }
 
-// Paginated list envelope (mirrors a typical Spring Data Page). // CONFIRM W/ MARWAN
-export interface PagedResponse<T> {
-  content: T[]
-  page: number
-  pageSize: number
-  totalElements: number
-  totalPages: number
+export interface RegisterRequest {
+  email: string
+  password: string
+  fullName: string
+  role: Role
+}
+
+export interface AuthResponse {
+  token: string
+  user: User
 }
