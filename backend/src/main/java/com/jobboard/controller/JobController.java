@@ -1,20 +1,27 @@
 package com.jobboard.controller;
 
+import com.jobboard.dto.JobRequest;
 import com.jobboard.dto.JobResponse;
 import com.jobboard.dto.PageResponse;
+import com.jobboard.model.JobType;
 import com.jobboard.service.JobService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/jobs")
+@Tag(name = "Jobs", description = "Job listing endpoints")
 public class JobController {
     private final JobService jobService;
 
@@ -25,41 +32,53 @@ public class JobController {
     @Operation(summary = "List jobs with pagination and optional filters")
     @GetMapping
     public PageResponse<JobResponse> getJobs(
+            @Parameter(description = "Search text matched against job title and description")
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) String jobType,
+            @Parameter(description = "Filter by job type")
+            @RequestParam(required = false) JobType jobType,
+            @Parameter(description = "Zero-based page number")
             @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size")
             @RequestParam(defaultValue = "10") int size
     ) {
-        return jobService.findAll(page, size);
+        return jobService.findAll(search, jobType, page, size);
     }
 
     @Operation(summary = "Get one job with company information")
     @GetMapping("/{id}")
-    public JobResponse getJob(@PathVariable Long id) {
+    public JobResponse getJob(@Parameter(description = "Job id") @PathVariable Long id) {
         return jobService.findById(id);
     }
 
     @Operation(summary = "Create a job listing")
     @PostMapping
-    public JobResponse createJob() {
-        throw new UnsupportedOperationException("Create job is not implemented yet");
+    public JobResponse createJob(@Valid @RequestBody JobRequest request) {
+        return jobService.create(request);
     }
 
     @Operation(summary = "Update a job listing")
     @PutMapping("/{id}")
-    public JobResponse updateJob(@PathVariable Long id) {
-        throw new UnsupportedOperationException("Update job is not implemented yet");
+    public JobResponse updateJob(
+            @Parameter(description = "Job id") @PathVariable Long id,
+            @Valid @RequestBody JobRequest request
+    ) {
+        return jobService.update(id, request);
     }
 
     @Operation(summary = "Soft-delete or deactivate a job listing")
     @DeleteMapping("/{id}")
-    public void deleteJob(@PathVariable Long id) {
-        throw new UnsupportedOperationException("Delete job is not implemented yet");
+    public void deleteJob(@Parameter(description = "Job id") @PathVariable Long id) {
+        jobService.delete(id);
     }
 
     @Operation(summary = "Get the current company's jobs")
     @GetMapping("/my")
-    public PageResponse<JobResponse> myJobs() {
-        throw new UnsupportedOperationException("My jobs is not implemented yet");
+    public PageResponse<JobResponse> myJobs(
+            @Parameter(description = "Zero-based page number")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size")
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return jobService.findCurrentCompanyJobs(page, size);
     }
 }

@@ -120,4 +120,26 @@ public class Job {
     public LocalDate getExpiresAt() {
         return expiresAt;
     }
+
+    public void update(
+            String title,
+            String description,
+            String location,
+            JobType jobType,
+            BigDecimal salaryMin,
+            BigDecimal salaryMax,
+            LocalDate expiresAt
+    ) {
+        this.title = title;
+        this.description = description;
+        this.location = location;
+        this.jobType = jobType;
+        this.salaryMin = salaryMin;
+        this.salaryMax = salaryMax;
+        this.expiresAt = expiresAt;
+    }
+
+    public void deactivate() {
+        this.active = false;
+    }
 }

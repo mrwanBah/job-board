@@ -48,7 +48,7 @@ CREATE TABLE applications (
 );
 INSERT INTO users (email, password_hash, full_name, role)
 VALUES
-  ('company@example.com', 'demo-hash', 'Acme Company Owner', 'COMPANY');
+  ('company@example.com', '$2a$10$MRlk8pJ3C435VBjxgTFKgO1rqNEsDldx1XwcKadnM1JHs.IAWTwI6', 'Acme Company Owner', 'COMPANY');
 
 INSERT INTO companies (user_id, name, description, website, logo_url, location)
 VALUES
