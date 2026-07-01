@@ -6,6 +6,8 @@ import com.jobboard.dto.JobResponse;
 import com.jobboard.model.ApplicationStatus;
 import com.jobboard.model.JobType;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Applications", description = "Job application endpoints")
 public class ApplicationController {
     @Operation(summary = "Apply to a job")
     @PostMapping("/jobs/{id}/apply")
-    public ApplicationResponse apply(@PathVariable Long id) {
+    public ApplicationResponse apply(@Parameter(description = "Job id") @PathVariable Long id) {
         return demoApplication();
     }
 
@@ -32,13 +35,13 @@ public class ApplicationController {
 
     @Operation(summary = "Get applicants for a job")
     @GetMapping("/jobs/{id}/applications")
-    public List<ApplicationResponse> jobApplications(@PathVariable Long id) {
+    public List<ApplicationResponse> jobApplications(@Parameter(description = "Job id") @PathVariable Long id) {
         return List.of(demoApplication());
     }
 
     @Operation(summary = "Update an application status")
     @PutMapping("/applications/{id}/status")
-    public ApplicationResponse updateStatus(@PathVariable Long id) {
+    public ApplicationResponse updateStatus(@Parameter(description = "Application id") @PathVariable Long id) {
         return demoApplication();
     }
 
