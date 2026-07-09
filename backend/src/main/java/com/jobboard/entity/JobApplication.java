@@ -71,4 +71,8 @@ public class JobApplication {
     public LocalDateTime getAppliedAt() {
         return appliedAt;
     }
+
+    public void updateStatus(ApplicationStatus status) {
+        this.status = status;
+    }
 }

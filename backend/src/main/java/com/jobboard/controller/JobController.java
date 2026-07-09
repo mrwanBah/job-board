@@ -7,6 +7,7 @@ import com.jobboard.model.JobType;
 import com.jobboard.service.JobService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @RestController
 @RequestMapping("/api/jobs")
@@ -29,7 +32,7 @@ public class JobController {
         this.jobService = jobService;
     }
 
-    @Operation(summary = "List jobs with pagination and optional filters")
+    @Operation(summary = "List active jobs", description = "Public paginated search by text and job type.")
     @GetMapping
     public PageResponse<JobResponse> getJobs(
             @Parameter(description = "Search text matched against job title and description")
@@ -44,19 +47,22 @@ public class JobController {
         return jobService.findAll(search, jobType, page, size);
     }
 
-    @Operation(summary = "Get one job with company information")
+    @Operation(summary = "Get job details", description = "Public job details including the company profile.")
     @GetMapping("/{id}")
     public JobResponse getJob(@Parameter(description = "Job id") @PathVariable Long id) {
         return jobService.findById(id);
     }
 
-    @Operation(summary = "Create a job listing")
+    @Operation(summary = "Create a job listing", description = "Company-only endpoint.")
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public JobResponse createJob(@Valid @RequestBody JobRequest request) {
         return jobService.create(request);
     }
 
-    @Operation(summary = "Update a job listing")
+    @Operation(summary = "Update a job listing", description = "Only the company that owns the job can update it.")
+    @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/{id}")
     public JobResponse updateJob(
             @Parameter(description = "Job id") @PathVariable Long id,
@@ -65,13 +71,16 @@ public class JobController {
         return jobService.update(id, request);
     }
 
-    @Operation(summary = "Soft-delete or deactivate a job listing")
+    @Operation(summary = "Deactivate a job listing", description = "Only the owning company can set the job inactive.")
+    @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteJob(@Parameter(description = "Job id") @PathVariable Long id) {
         jobService.delete(id);
     }
 
-    @Operation(summary = "Get the current company's jobs")
+    @Operation(summary = "Get current company's jobs", description = "Returns active jobs owned by the authenticated company.")
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/my")
     public PageResponse<JobResponse> myJobs(
             @Parameter(description = "Zero-based page number")

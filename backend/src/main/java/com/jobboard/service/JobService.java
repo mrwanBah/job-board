@@ -62,7 +62,7 @@ public class JobService {
 
     public JobResponse findById(Long id) {
         Job job = jobRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Job not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found"));
         return jobMapper.toResponse(job);
     }
 

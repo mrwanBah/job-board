@@ -1,64 +1,66 @@
 package com.jobboard.controller;
 
+import com.jobboard.dto.ApplicationRequest;
 import com.jobboard.dto.ApplicationResponse;
-import com.jobboard.dto.CompanyResponse;
-import com.jobboard.dto.JobResponse;
-import com.jobboard.model.ApplicationStatus;
-import com.jobboard.model.JobType;
+import com.jobboard.dto.ApplicationStatusRequest;
+import com.jobboard.service.ApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.math.BigDecimal;
+import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-@Tag(name = "Applications", description = "Job application endpoints")
+@Tag(name = "Applications", description = "Applicant and company application workflows")
+@SecurityRequirement(name = "bearerAuth")
 public class ApplicationController {
-    @Operation(summary = "Apply to a job")
-    @PostMapping("/jobs/{id}/apply")
-    public ApplicationResponse apply(@Parameter(description = "Job id") @PathVariable Long id) {
-        return demoApplication();
+    private final ApplicationService applicationService;
+
+    public ApplicationController(ApplicationService applicationService) {
+        this.applicationService = applicationService;
     }
 
-    @Operation(summary = "Get my applications")
+    @Operation(summary = "Apply to a job", description = "Applicant-only endpoint. Duplicate applications are rejected.")
+    @PostMapping("/jobs/{id}/apply")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApplicationResponse apply(
+            @Parameter(description = "Job id", required = true) @PathVariable Long id,
+            @Valid @RequestBody ApplicationRequest request
+    ) {
+        return applicationService.apply(id, request);
+    }
+
+    @Operation(summary = "Get my applications", description = "Returns applications submitted by the authenticated applicant.")
     @GetMapping("/applications/mine")
     public List<ApplicationResponse> myApplications() {
-        return List.of(demoApplication());
+        return applicationService.findMine();
     }
 
-    @Operation(summary = "Get applicants for a job")
+    @Operation(summary = "Get applicants for a job", description = "Company-only endpoint for a job owned by the company.")
     @GetMapping("/jobs/{id}/applications")
-    public List<ApplicationResponse> jobApplications(@Parameter(description = "Job id") @PathVariable Long id) {
-        return List.of(demoApplication());
+    public List<ApplicationResponse> jobApplications(
+            @Parameter(description = "Job id", required = true) @PathVariable Long id
+    ) {
+        return applicationService.findForJob(id);
     }
 
-    @Operation(summary = "Update an application status")
+    @Operation(summary = "Update application status", description = "The owning company can accept, reject, or review an application.")
     @PutMapping("/applications/{id}/status")
-    public ApplicationResponse updateStatus(@Parameter(description = "Application id") @PathVariable Long id) {
-        return demoApplication();
-    }
-
-    private ApplicationResponse demoApplication() {
-        CompanyResponse company = new CompanyResponse(1L, "Acme Tech", null, null, null, "Riyadh");
-        JobResponse job = new JobResponse(
-                1L,
-                "Backend Intern",
-                "Build Spring Boot APIs for a job board.",
-                "Riyadh",
-                JobType.INTERNSHIP,
-                new BigDecimal("3000.00"),
-                new BigDecimal("5000.00"),
-                true,
-                "2026-06-12T10:00:00",
-                company
-        );
-        return new ApplicationResponse(1L, job, "I am interested in this role.", ApplicationStatus.PENDING, "2026-06-12T10:30:00");
+    public ApplicationResponse updateStatus(
+            @Parameter(description = "Application id", required = true) @PathVariable Long id,
+            @Valid @RequestBody ApplicationStatusRequest request
+    ) {
+        return applicationService.updateStatus(id, request);
     }
 }

@@ -2,6 +2,19 @@
 
 A full-stack job board web application. Applicants browse and apply to jobs; companies post listings and manage applicants.
 
+## Backend local setup
+
+1. Copy `.env.example` to `.env` and replace every placeholder secret.
+2. Start MySQL with `docker compose up -d mysql`.
+3. Export the `SPRING_DATASOURCE_*` and `JWT_*` values from `.env`.
+4. Run `cd backend` followed by `./mvnw spring-boot:run`.
+
+The API runs at `http://localhost:8080`. Swagger UI is available at
+`http://localhost:8080/swagger-ui.html`.
+
+The Postman collection is stored at
+`postman/Job-Board-API.postman_collection.json`.
+
 ## Monorepo layout
 
 | Path                 | What it is                                                        |
