@@ -73,4 +73,12 @@ public class Company {
     public String getLocation() {
         return location;
     }
+
+    public void update(String name, String description, String website, String logoUrl, String location) {
+        this.name = name;
+        this.description = description;
+        this.website = website;
+        this.logoUrl = logoUrl;
+        this.location = location;
+    }
 }
