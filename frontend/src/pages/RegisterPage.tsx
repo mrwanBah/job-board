@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { authApi } from '../api/authApi'
 import { useAuthStore } from '../stores/authStore'
+import { apiErrorMessage } from '../utils/apiError'
 import type { RegisterRequest } from '../types'
 
 const inputClass =
@@ -24,8 +25,8 @@ export default function RegisterPage() {
       const { token, user } = await authApi.register(values)
       setAuth(token, user)
       navigate('/dashboard')
-    } catch {
-      setServerError('Could not create account. Try a different email.')
+    } catch (e) {
+      setServerError(apiErrorMessage(e, 'Could not create account. Try a different email.'))
     }
   }
 
