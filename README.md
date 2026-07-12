@@ -2,6 +2,10 @@
 
 A full-stack job board web application. Applicants browse and apply to jobs; companies post listings and manage applicants.
 
+## Architecture
+
+![Architecture diagram](docs/architecture.png)
+
 ## Backend local setup
 
 1. Copy `.env.example` to `.env` and replace every placeholder secret.
@@ -20,7 +24,7 @@ The Postman collection is stored at
 | Path                 | What it is                                                        |
 | -------------------- | ----------------------------------------------------------------- |
 | `frontend/`          | React + TypeScript SPA (Vite, Tailwind, React Query, Zustand)     |
-| `backend/`           | Java 17 + Spring Boot REST API + MySQL *(in progress)*            |
+| `backend/`           | Java 17 + Spring Boot REST API + MySQL                            |
 | `docker-compose.yml` | Runs MySQL + backend + frontend together                          |
 
 ## Roles
@@ -56,7 +60,14 @@ VITE_API_URL=http://localhost:8080
 docker compose up --build
 ```
 
-Frontend → http://localhost:5173 · API → http://localhost:8080 · MySQL → :3306
+Frontend → http://localhost:5173 · API → http://localhost:8080 · MySQL → :3307
+
+## Screenshots
+
+<!-- Add screenshots once the app looks the way you want, e.g.: -->
+<!-- ![Home page](docs/screenshots/home.png) -->
+<!-- ![Job detail + apply](docs/screenshots/job-detail.png) -->
+<!-- ![Company dashboard](docs/screenshots/dashboard.png) -->
 
 ## Branching
 
