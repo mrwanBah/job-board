@@ -16,8 +16,11 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<RegisterRequest>({ defaultValues: { role: 'APPLICANT' } })
+  const role = watch('role')
+  const isCompany = role === 'COMPANY'
 
   const onSubmit = async (values: RegisterRequest) => {
     setServerError(null)
@@ -42,11 +45,28 @@ export default function RegisterPage() {
           <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{serverError}</p>
         )}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Full name</label>
+          <label className="block text-sm font-medium text-gray-700">I am a</label>
+          <select className={inputClass} {...register('role', { required: true })}>
+            <option value="APPLICANT">Applicant — looking for jobs</option>
+            <option value="COMPANY">Company — hiring</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            {isCompany ? 'Company name' : 'Full name'}
+          </label>
           <input
             className={inputClass}
-            {...register('fullName', { required: 'Full name is required' })}
+            placeholder={isCompany ? 'e.g. Acme Corp' : undefined}
+            {...register('fullName', {
+              required: isCompany ? 'Company name is required' : 'Full name is required',
+            })}
           />
+          {isCompany && (
+            <p className="mt-1 text-xs text-gray-500">
+              This is shown publicly on your job listings.
+            </p>
+          )}
           {errors.fullName && (
             <p className="mt-1 text-xs text-red-600">{errors.fullName.message}</p>
           )}
@@ -76,13 +96,6 @@ export default function RegisterPage() {
           {errors.password && (
             <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>
           )}
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">I am a</label>
-          <select className={inputClass} {...register('role', { required: true })}>
-            <option value="APPLICANT">Applicant — looking for jobs</option>
-            <option value="COMPANY">Company — hiring</option>
-          </select>
         </div>
         <button
           type="submit"

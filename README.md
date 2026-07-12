@@ -64,10 +64,17 @@ Frontend → http://localhost:5173 · API → http://localhost:8080 · MySQL →
 
 ## Screenshots
 
-<!-- Add screenshots once the app looks the way you want, e.g.: -->
-<!-- ![Home page](docs/screenshots/home.png) -->
-<!-- ![Job detail + apply](docs/screenshots/job-detail.png) -->
-<!-- ![Company dashboard](docs/screenshots/dashboard.png) -->
+**Home — browse & filter jobs**
+![Home page](docs/screenshots/home.png)
+
+**Post a job**
+![Post a job](docs/screenshots/post-job.png)
+
+**Applicant dashboard**
+![Applicant dashboard](docs/screenshots/applicant-dashboard.png)
+
+**Company dashboard**
+![Company dashboard](docs/screenshots/company-dashboard.png)
 
 ## Branching
 
