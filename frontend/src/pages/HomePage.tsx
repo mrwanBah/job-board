@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import FilterBar from '../components/FilterBar'
 import JobCard from '../components/JobCard'
+import Spinner from '../components/Spinner'
 import { useJobs } from '../hooks/useJobs'
 import type { JobType } from '../types'
 
@@ -44,7 +45,7 @@ export default function HomePage() {
 
       <div className="mt-6">
         {isPending ? (
-          <p className="py-12 text-center text-gray-500">Loading jobs…</p>
+          <Spinner label="Loading jobs…" />
         ) : isError ? (
           <p className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
             Couldn’t load jobs. Make sure the API is running, then try again.

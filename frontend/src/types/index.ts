@@ -68,3 +68,26 @@ export interface AuthResponse {
   token: string
   user: User
 }
+
+// Body for POST/PUT /api/jobs (mirror dto/JobRequest). expiresAt is 'YYYY-MM-DD'.
+export interface JobRequest {
+  title: string
+  description: string
+  location?: string
+  jobType: JobType
+  salaryMin?: number | null
+  salaryMax?: number | null
+  expiresAt?: string | null
+}
+
+export type ApplicationStatus = 'PENDING' | 'REVIEWED' | 'REJECTED' | 'ACCEPTED'
+
+// Mirrors dto/ApplicationResponse.
+export interface Application {
+  id: number
+  job: Job
+  applicant: User
+  coverLetter?: string | null
+  status: ApplicationStatus
+  appliedAt: string
+}

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { authApi } from '../api/authApi'
 import { useAuthStore } from '../stores/authStore'
+import { apiErrorMessage } from '../utils/apiError'
 import type { LoginRequest } from '../types'
 
 const inputClass =
@@ -24,8 +25,8 @@ export default function LoginPage() {
       const { token, user } = await authApi.login(values)
       setAuth(token, user)
       navigate('/dashboard')
-    } catch {
-      setServerError('Invalid email or password.')
+    } catch (e) {
+      setServerError(apiErrorMessage(e, 'Invalid email or password.'))
     }
   }
 
