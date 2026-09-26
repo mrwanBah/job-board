@@ -29,7 +29,7 @@ public class ApplicationMapper {
                 applicantResponse,
                 application.getCoverLetter(),
                 application.getStatus(),
-                application.getAppliedAt().toString()
+                application.getAppliedAt()
         );
     }
 }

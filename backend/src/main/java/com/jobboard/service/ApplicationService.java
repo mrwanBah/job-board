@@ -7,6 +7,7 @@ import com.jobboard.entity.Company;
 import com.jobboard.entity.Job;
 import com.jobboard.entity.JobApplication;
 import com.jobboard.entity.User;
+import com.jobboard.exception.NotFoundException;
 import com.jobboard.mapper.ApplicationMapper;
 import com.jobboard.model.Role;
 import com.jobboard.repository.CompanyRepository;
@@ -44,7 +45,7 @@ public class ApplicationService {
     public ApplicationResponse apply(Long jobId, ApplicationRequest request) {
         User applicant = requireApplicant();
         Job job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found"));
+                .orElseThrow(() -> new NotFoundException("Job not found"));
 
         if (!job.isActive()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This job is no longer accepting applications");
@@ -70,7 +71,7 @@ public class ApplicationService {
     public List<ApplicationResponse> findForJob(Long jobId) {
         Company company = requireCompany();
         Job job = jobRepository.findById(jobId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found"));
+                .orElseThrow(() -> new NotFoundException("Job not found"));
         ensureJobOwner(job, company);
 
         return applicationRepository.findByJobIdOrderByAppliedAtDesc(jobId)
@@ -82,7 +83,7 @@ public class ApplicationService {
     public ApplicationResponse updateStatus(Long applicationId, ApplicationStatusRequest request) {
         Company company = requireCompany();
         JobApplication application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Application not found"));
+                .orElseThrow(() -> new NotFoundException("Application not found"));
         ensureJobOwner(application.getJob(), company);
 
         application.updateStatus(request.status());
@@ -103,7 +104,7 @@ public class ApplicationService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only company users can perform this action");
         }
         return companyRepository.findByUser(user)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company profile not found"));
+                .orElseThrow(() -> new NotFoundException("Company profile not found"));
     }
 
     private void ensureJobOwner(Job job, Company company) {

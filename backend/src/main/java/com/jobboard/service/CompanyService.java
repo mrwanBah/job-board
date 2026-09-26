@@ -4,6 +4,7 @@ import com.jobboard.dto.CompanyResponse;
 import com.jobboard.dto.CompanyUpdateRequest;
 import com.jobboard.entity.Company;
 import com.jobboard.entity.User;
+import com.jobboard.exception.NotFoundException;
 import com.jobboard.model.Role;
 import com.jobboard.repository.CompanyRepository;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ public class CompanyService {
     @Transactional(readOnly = true)
     public CompanyResponse findById(Long id) {
         return toResponse(companyRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found")));
+                .orElseThrow(() -> new NotFoundException("Company not found")));
     }
 
     public CompanyResponse updateMine(CompanyUpdateRequest request) {
@@ -35,7 +36,7 @@ public class CompanyService {
         }
 
         Company company = companyRepository.findByUser(user)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company profile not found"));
+                .orElseThrow(() -> new NotFoundException("Company profile not found"));
         company.update(request.name(), request.description(), request.website(), request.logoUrl(), request.location());
         return toResponse(companyRepository.save(company));
     }

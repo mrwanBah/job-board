@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,7 @@ public class ApplicationController {
     }
 
     @Operation(summary = "Apply to a job", description = "Applicant-only endpoint. Duplicate applications are rejected.")
+    @PreAuthorize("hasRole('APPLICANT')")
     @PostMapping("/jobs/{id}/apply")
     @ResponseStatus(HttpStatus.CREATED)
     public ApplicationResponse apply(
@@ -42,12 +44,14 @@ public class ApplicationController {
     }
 
     @Operation(summary = "Get my applications", description = "Returns applications submitted by the authenticated applicant.")
+    @PreAuthorize("hasRole('APPLICANT')")
     @GetMapping("/applications/mine")
     public List<ApplicationResponse> myApplications() {
         return applicationService.findMine();
     }
 
     @Operation(summary = "Get applicants for a job", description = "Company-only endpoint for a job owned by the company.")
+    @PreAuthorize("hasRole('COMPANY')")
     @GetMapping("/jobs/{id}/applications")
     public List<ApplicationResponse> jobApplications(
             @Parameter(description = "Job id", required = true) @PathVariable Long id
@@ -56,6 +60,7 @@ public class ApplicationController {
     }
 
     @Operation(summary = "Update application status", description = "The owning company can accept, reject, or review an application.")
+    @PreAuthorize("hasRole('COMPANY')")
     @PutMapping("/applications/{id}/status")
     public ApplicationResponse updateStatus(
             @Parameter(description = "Application id", required = true) @PathVariable Long id,

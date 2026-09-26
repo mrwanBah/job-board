@@ -29,7 +29,7 @@ public class JobMapper {
                 job.getSalaryMin(),
                 job.getSalaryMax(),
                 job.isActive(),
-                job.getCreatedAt().toString(),
+                job.getCreatedAt(),
                 companyResponse
         );
     }
