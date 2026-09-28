@@ -2,6 +2,10 @@
 
 A full-stack job board web application. Applicants browse and apply to jobs; companies post listings and manage applicants.
 
+## Architecture
+
+![Architecture diagram](docs/architecture.png)
+
 ## Backend local setup
 
 1. Copy `.env.example` to `.env` and replace every placeholder secret.
@@ -36,7 +40,7 @@ cd backend
 | Path                 | What it is                                                        |
 | -------------------- | ----------------------------------------------------------------- |
 | `frontend/`          | React + TypeScript SPA (Vite, Tailwind, React Query, Zustand)     |
-| `backend/`           | Java 17 + Spring Boot REST API + MySQL *(in progress)*            |
+| `backend/`           | Java 17 + Spring Boot REST API + MySQL                            |
 | `docker-compose.yml` | Runs MySQL + backend + frontend together                          |
 
 ## Roles
@@ -72,10 +76,21 @@ VITE_API_URL=http://localhost:8080
 docker compose up --build
 ```
 
-API → http://localhost:8080 · MySQL → localhost:3307
+Frontend → http://localhost:5173 · API → http://localhost:8080 · MySQL → :3307
 
-The current Docker Compose file runs MySQL and the Spring Boot backend. Run the
-frontend separately with `npm run dev` during local development.
+## Screenshots
+
+**Home — browse & filter jobs**
+![Home page](docs/screenshots/home.png)
+
+**Post a job**
+![Post a job](docs/screenshots/post-job.png)
+
+**Applicant dashboard**
+![Applicant dashboard](docs/screenshots/applicant-dashboard.png)
+
+**Company dashboard**
+![Company dashboard](docs/screenshots/company-dashboard.png)
 
 ## Branching
 

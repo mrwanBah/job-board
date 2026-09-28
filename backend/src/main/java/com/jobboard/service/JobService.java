@@ -56,8 +56,10 @@ public class JobService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Company company = getCurrentCompany();
 
-        Specification<Job> specification = JobSpecifications.active()
-                .and(JobSpecifications.ownedByCompany(company.getId()));
+        // Includes inactive (deactivated) jobs so the company can still review past
+        // applicants - the frontend shows an "Inactive" badge and hides Deactivate
+        // for these.
+        Specification<Job> specification = JobSpecifications.ownedByCompany(company.getId());
 
         return toPageResponse(jobRepository.findAll(specification, pageable));
     }

@@ -5,5 +5,4 @@ export const JOB_TYPE_LABELS: Record<JobType, string> = {
   PART_TIME: 'Part-time',
   CONTRACT: 'Contract',
   INTERNSHIP: 'Internship',
-  REMOTE: 'Remote',
 }
