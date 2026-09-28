@@ -19,6 +19,22 @@ The API runs at `http://localhost:8080`. Swagger UI is available at
 The Postman collection is stored at
 `postman/Job-Board-API.postman_collection.json`.
 
+Backend tests use an H2 test profile, so they do not require a running MySQL
+container:
+
+```bash
+cd backend
+./mvnw test
+```
+
+If Docker is not running and you only need to test the API locally, use the
+local H2 profile:
+
+```powershell
+cd backend
+.\run-local.ps1
+```
+
 ## Monorepo layout
 
 | Path                 | What it is                                                        |

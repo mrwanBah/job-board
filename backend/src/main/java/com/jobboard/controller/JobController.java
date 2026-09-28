@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,6 +56,7 @@ public class JobController {
 
     @Operation(summary = "Create a job listing", description = "Company-only endpoint.")
     @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('COMPANY')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public JobResponse createJob(@Valid @RequestBody JobRequest request) {
@@ -63,6 +65,7 @@ public class JobController {
 
     @Operation(summary = "Update a job listing", description = "Only the company that owns the job can update it.")
     @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('COMPANY')")
     @PutMapping("/{id}")
     public JobResponse updateJob(
             @Parameter(description = "Job id") @PathVariable Long id,
@@ -73,6 +76,7 @@ public class JobController {
 
     @Operation(summary = "Deactivate a job listing", description = "Only the owning company can set the job inactive.")
     @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('COMPANY')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteJob(@Parameter(description = "Job id") @PathVariable Long id) {
@@ -81,6 +85,7 @@ public class JobController {
 
     @Operation(summary = "Get current company's jobs", description = "Returns active jobs owned by the authenticated company.")
     @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('COMPANY')")
     @GetMapping("/my")
     public PageResponse<JobResponse> myJobs(
             @Parameter(description = "Zero-based page number")

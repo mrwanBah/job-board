@@ -2,6 +2,7 @@ package com.jobboard.dto;
 
 import com.jobboard.model.JobType;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public record JobResponse(
         Long id,
@@ -12,7 +13,7 @@ public record JobResponse(
         BigDecimal salaryMin,
         BigDecimal salaryMax,
         boolean isActive,
-        String createdAt,
+        LocalDateTime createdAt,
         CompanyResponse company
 ) {
 }

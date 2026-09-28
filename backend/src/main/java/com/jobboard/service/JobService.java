@@ -6,6 +6,7 @@ import com.jobboard.dto.PageResponse;
 import com.jobboard.entity.Company;
 import com.jobboard.entity.Job;
 import com.jobboard.entity.User;
+import com.jobboard.exception.NotFoundException;
 import com.jobboard.mapper.JobMapper;
 import com.jobboard.model.JobType;
 import com.jobboard.model.Role;
@@ -19,9 +20,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
+@Transactional
 public class JobService {
     private final JobRepository jobRepository;
     private final JobMapper jobMapper;
@@ -40,29 +43,31 @@ public class JobService {
         this.companyRepository = companyRepository;
     }
 
+    @Transactional(readOnly = true)
     public PageResponse<JobResponse> findAll(String search, JobType jobType, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Job> jobs = jobRepository.findAll(buildSpecification(search, jobType), pageable);
+        Page<Job> jobs = jobRepository.findAll(JobSpecifications.publicFilters(search, jobType), pageable);
 
         return toPageResponse(jobs);
     }
 
+    @Transactional(readOnly = true)
     public PageResponse<JobResponse> findCurrentCompanyJobs(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Company company = getCurrentCompany();
 
         // Includes inactive (deactivated) jobs so the company can still review past
-        // applicants — the frontend shows an "Inactive" badge and hides Deactivate
+        // applicants - the frontend shows an "Inactive" badge and hides Deactivate
         // for these.
-        Specification<Job> specification = (root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("company").get("id"), company.getId());
+        Specification<Job> specification = JobSpecifications.ownedByCompany(company.getId());
 
         return toPageResponse(jobRepository.findAll(specification, pageable));
     }
 
+    @Transactional(readOnly = true)
     public JobResponse findById(Long id) {
         Job job = jobRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found"));
+                .orElseThrow(() -> new NotFoundException("Job not found"));
         return jobMapper.toResponse(job);
     }
 
@@ -107,7 +112,7 @@ public class JobService {
     private Job getCurrentCompanyJob(Long id) {
         Company company = getCurrentCompany();
         Job job = jobRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found"));
+                .orElseThrow(() -> new NotFoundException("Job not found"));
 
         if (!job.getCompany().getId().equals(company.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only manage your own jobs");
@@ -123,7 +128,7 @@ public class JobService {
         }
 
         return companyRepository.findByUser(user)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company profile not found"));
+                .orElseThrow(() -> new NotFoundException("Company profile not found"));
     }
 
     private PageResponse<JobResponse> toPageResponse(Page<Job> jobs) {
@@ -139,28 +144,5 @@ public class JobService {
                 jobs.getTotalElements(),
                 jobs.getTotalPages()
         );
-    }
-
-    private Specification<Job> buildSpecification(String search, JobType jobType) {
-        Specification<Job> specification = (root, query, criteriaBuilder) ->
-                criteriaBuilder.isTrue(root.get("active"));
-
-        if (search != null && !search.isBlank()) {
-            String pattern = "%" + search.toLowerCase() + "%";
-            specification = specification.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.or(
-                            criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), pattern),
-                            criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), pattern)
-                    )
-            );
-        }
-
-        if (jobType != null) {
-            specification = specification.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("jobType"), jobType)
-            );
-        }
-
-        return specification;
     }
 }
