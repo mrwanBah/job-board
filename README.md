@@ -82,6 +82,12 @@ On macOS/Linux use backend/run-local.sh. This development profile uses in-memory
 
 Use Swagger's Authorize button with the token returned by login. The Postman collection is in postman/. Errors use {status, message, errors}; validation errors contain field messages. Unauthorized requests return 401, role/ownership failures 403, duplicate data 409.
 
+Run the Postman collection in folder order. Each run creates unique test accounts, records the returned IDs and tokens, then verifies status tracking, deactivation and reactivation. It works independently of the demo seed accounts. Against a running API:
+
+```sh
+npx --yes --package=newman@6.2.1 newman run postman/Job-Board-API.postman_collection.json
+```
+
 ## Verification
 
 ```sh
