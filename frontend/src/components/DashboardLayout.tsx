@@ -41,6 +41,7 @@ export default function DashboardLayout() {
           </NavLink>
           {user?.role === 'COMPANY' && (
             <>
+              <NavLink to="/dashboard/company" className={navItem}>Company profile</NavLink>
               <NavLink to="/dashboard/jobs" className={navItem}>
                 My jobs
               </NavLink>

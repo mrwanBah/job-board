@@ -7,7 +7,8 @@ export function apiErrorMessage(
   fallback = 'Something went wrong. Please try again.',
 ): string {
   if (axios.isAxiosError(error)) {
-    const data = error.response?.data as { message?: string; error?: string } | undefined
+    const data = error.response?.data as { message?: string; error?: string; errors?: Record<string, string> } | undefined
+    if (data?.errors && Object.keys(data.errors).length) return Object.values(data.errors).join(' · ')
     if (data?.message) return data.message
     if (data?.error) return data.error
     if (error.response?.status === 403) return 'You do not have permission to do that.'

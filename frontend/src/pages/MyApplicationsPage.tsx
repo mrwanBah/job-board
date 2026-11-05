@@ -1,9 +1,11 @@
+import { usePageTitle } from '../hooks/usePageTitle'
 import { Link } from 'react-router-dom'
 import { useMyApplications } from '../hooks/useApplications'
 import StatusBadge from '../components/StatusBadge'
 import Spinner from '../components/Spinner'
 
 export default function MyApplicationsPage() {
+  usePageTitle('My applications')
   const { data: apps, isPending, isError } = useMyApplications()
 
   return (
@@ -14,7 +16,7 @@ export default function MyApplicationsPage() {
         {isPending ? (
           <Spinner label="Loading your applications…" />
         ) : isError ? (
-          <p className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+          <p aria-live="polite" className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
             Couldn’t load your applications. Make sure the API is running.
           </p>
         ) : !apps || apps.length === 0 ? (

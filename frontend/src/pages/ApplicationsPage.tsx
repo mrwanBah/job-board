@@ -1,3 +1,4 @@
+import { usePageTitle } from '../hooks/usePageTitle'
 import { Link, useParams } from 'react-router-dom'
 import { useJob } from '../hooks/useJobs'
 import { useJobApplications, useUpdateApplicationStatus } from '../hooks/useApplications'
@@ -24,6 +25,7 @@ const ACTIONS: { status: ApplicationStatus; label: string; className: string }[]
 ]
 
 export default function ApplicationsPage() {
+  usePageTitle('Applicants')
   const { id } = useParams()
   const { data: job } = useJob(id)
   const { data: apps, isPending, isError } = useJobApplications(id)
@@ -42,7 +44,7 @@ export default function ApplicationsPage() {
         {isPending ? (
           <Spinner label="Loading applicants…" />
         ) : isError ? (
-          <p className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+          <p aria-live="polite" className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
             Couldn’t load applicants. Make sure the API is running.
           </p>
         ) : !apps || apps.length === 0 ? (

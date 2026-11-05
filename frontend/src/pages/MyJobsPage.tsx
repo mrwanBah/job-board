@@ -1,12 +1,16 @@
+import { usePageTitle } from '../hooks/usePageTitle'
+import { isExpired } from '../utils/jobs'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useDeactivateJob, useMyJobs } from '../hooks/useJobs'
+import { useActivateJob, useDeactivateJob, useMyJobs } from '../hooks/useJobs'
 import { JOB_TYPE_LABELS } from '../utils/jobTypes'
 import Spinner from '../components/Spinner'
 
 export default function MyJobsPage() {
+  usePageTitle('My jobs')
   const [page, setPage] = useState(0)
   const { data, isPending, isError } = useMyJobs({ page, size: 10 })
+  const activate = useActivateJob()
   const deactivate = useDeactivateJob()
 
   const jobs = data?.content ?? []
@@ -34,7 +38,7 @@ export default function MyJobsPage() {
         {isPending ? (
           <Spinner label="Loading your jobs…" />
         ) : isError ? (
-          <p className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+          <p aria-live="polite" className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
             Couldn’t load your jobs. Make sure the API is running.
           </p>
         ) : jobs.length === 0 ? (
@@ -58,6 +62,7 @@ export default function MyJobsPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-gray-900">{job.title}</h3>
+                      {isExpired(job) && <span className="rounded-full bg-amber-50 px-2 text-xs text-amber-800">Expired</span>}
                       {!job.isActive && (
                         <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500">
                           Inactive
@@ -65,7 +70,7 @@ export default function MyJobsPage() {
                       )}
                     </div>
                     <p className="text-sm text-gray-500">
-                      {JOB_TYPE_LABELS[job.jobType]} · {job.location || 'No location'}
+                      {JOB_TYPE_LABELS[job.jobType]} · {job.location || 'No location'} {job.expiresAt && ' · Expires ' + job.expiresAt}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2 text-sm">
@@ -81,6 +86,7 @@ export default function MyJobsPage() {
                     >
                       Edit
                     </Link>
+                    {!job.isActive && <button disabled={activate.isPending || isExpired(job)} onClick={() => activate.mutate(job.id)} className="rounded-md border px-3 py-1.5 disabled:opacity-50">Reactivate</button>}
                     {job.isActive && (
                       <button
                         onClick={() => onDeactivate(job.id, job.title)}
