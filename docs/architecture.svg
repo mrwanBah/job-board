@@ -35,13 +35,13 @@
   <text x="450" y="340" text-anchor="middle" font-size="11" fill="#047857">eclipse-temurin (jdk-&gt;jre)</text>
   <text x="450" y="360" text-anchor="middle" font-size="11" font-weight="600" fill="#10b981">host :8080</text>
 
-  <!-- MySQL -->
+  <!-- PostgreSQL -->
   <rect x="590" y="260" width="210" height="120" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="2" />
-  <text x="695" y="288" text-anchor="middle" font-size="14" font-weight="700" fill="#9a3412">mysql</text>
-  <text x="695" y="308" text-anchor="middle" font-size="11" fill="#c2410c">MySQL 8</text>
-  <text x="695" y="324" text-anchor="middle" font-size="11" fill="#c2410c">schema.sql (auto-init)</text>
-  <text x="695" y="340" text-anchor="middle" font-size="11" fill="#c2410c">mysql_data volume</text>
-  <text x="695" y="360" text-anchor="middle" font-size="11" font-weight="600" fill="#ea580c">host :3307 -&gt; :3306</text>
+  <text x="695" y="288" text-anchor="middle" font-size="14" font-weight="700" fill="#9a3412">postgres</text>
+  <text x="695" y="308" text-anchor="middle" font-size="11" fill="#c2410c">PostgreSQL 16</text>
+  <text x="695" y="324" text-anchor="middle" font-size="11" fill="#c2410c">Flyway migrations</text>
+  <text x="695" y="340" text-anchor="middle" font-size="11" fill="#c2410c">postgres_data volume</text>
+  <text x="695" y="360" text-anchor="middle" font-size="11" font-weight="600" fill="#ea580c">host :5433 -&gt; :5432</text>
 
   <!-- Arrows: Browser -> Frontend -->
   <path d="M 400 150 L 220 260" fill="none" stroke="#4b5563" stroke-width="1.75" marker-end="url(#arrow)" />
@@ -51,11 +51,12 @@
   <path d="M 450 150 L 450 260" fill="none" stroke="#4b5563" stroke-width="1.75" marker-end="url(#arrow)" />
   <text x="459" y="205" font-size="11" fill="#374151">REST /api + JWT</text>
 
-  <!-- Arrows: Backend -> MySQL -->
+  <!-- Arrows: Backend -> PostgreSQL -->
   <path d="M 555 320 L 590 320" fill="none" stroke="#4b5563" stroke-width="1.75" marker-end="url(#arrow)" />
   <text x="558" y="312" font-size="10" fill="#374151">JDBC</text>
 
+  <text x="450" y="425" text-anchor="middle" font-size="12" fill="#374151">PostgreSQL healthy → backend /actuator/health healthy → frontend starts</text>
   <!-- Legend / notes -->
-  <text x="80" y="480" font-size="11" fill="#6b7280">frontend and backend are built from their own Dockerfile (multi-stage); mysql uses the official image.</text>
+  <text x="80" y="480" font-size="11" fill="#6b7280">frontend and backend are built from their own Dockerfile (multi-stage); postgres uses the official image.</text>
   <text x="80" y="498" font-size="11" fill="#6b7280">Production: frontend deploys to Vercel (VITE_API_URL env var); backend deploys separately (URL confirmed once live).</text>
 </svg>
