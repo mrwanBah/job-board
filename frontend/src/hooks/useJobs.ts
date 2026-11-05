@@ -70,3 +70,8 @@ export function useDeactivateJob() {
     onError: (e) => toast.error(apiErrorMessage(e)),
   })
 }
+
+export function useActivateJob() {
+  const qc = useQueryClient()
+  return useMutation({ mutationFn: jobsApi.activate, onSuccess: () => { qc.invalidateQueries({queryKey:['my-jobs']}); qc.invalidateQueries({queryKey:['jobs']}); toast.success('Job reactivated.') }, onError: e => toast.error(apiErrorMessage(e)) })
+}

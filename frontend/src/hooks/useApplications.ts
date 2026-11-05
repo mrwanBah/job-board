@@ -25,6 +25,7 @@ export function useApplyToJob(jobId: string | number) {
     mutationFn: (coverLetter?: string) => applicationsApi.apply(jobId, coverLetter),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['my-applications'] })
+      qc.invalidateQueries({ queryKey: ['my-application'] })
       toast.success('Application submitted!')
     },
     onError: (e) => toast.error(apiErrorMessage(e)),

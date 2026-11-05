@@ -1,3 +1,4 @@
+import CompanyProfilePage from './pages/CompanyProfilePage'
 import { createBrowserRouter } from 'react-router-dom'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
           {
             element: <RoleRoute allow={['COMPANY']} />,
             children: [
+              { path: '/dashboard/company', element: <CompanyProfilePage /> },
               { path: '/dashboard/jobs', element: <MyJobsPage /> },
               { path: '/dashboard/jobs/new', element: <PostJobPage /> },
               { path: '/dashboard/jobs/:id/edit', element: <PostJobPage /> },

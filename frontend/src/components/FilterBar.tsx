@@ -19,13 +19,15 @@ export default function FilterBar({
 }: FilterBarProps) {
   return (
     <div className="grid gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:grid-cols-2">
-      <input
+      <label htmlFor="search" className="sr-only">Search jobs</label>
+      <input id="search"
         className={inputClass}
         placeholder="Search title or keyword"
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
       />
-      <select
+      <label htmlFor="jobType" className="sr-only">Job type</label>
+      <select id="jobType"
         className={inputClass}
         value={jobType}
         onChange={(e) => onJobTypeChange(e.target.value as JobType | '')}

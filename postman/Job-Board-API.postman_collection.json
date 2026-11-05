@@ -2,15 +2,30 @@
   "info": {
     "_postman_id": "3af2d3fd-f972-4a44-a8df-c69ff1bf099b",
     "name": "Job Board API",
-    "description": "Week 4 backend verification collection. Run requests in folder order.",
+    "description": "Job board authentication, listings, company profiles and application workflows. Demo login password: DemoPass123! when demo data is enabled. Use distinct emails for registration.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:8080" },
-    { "key": "companyToken", "value": "" },
-    { "key": "applicantToken", "value": "" },
-    { "key": "jobId", "value": "1" },
-    { "key": "applicationId", "value": "1" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "companyToken",
+      "value": ""
+    },
+    {
+      "key": "applicantToken",
+      "value": ""
+    },
+    {
+      "key": "jobId",
+      "value": "1"
+    },
+    {
+      "key": "applicationId",
+      "value": "1"
+    }
   ],
   "item": [
     {
@@ -20,7 +35,12 @@
           "name": "Register applicant",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\"email\":\"applicant@example.com\",\"password\":\"password123\",\"fullName\":\"Demo Applicant\",\"role\":\"APPLICANT\"}"
@@ -30,18 +50,25 @@
         },
         {
           "name": "Login applicant",
-          "event": [{
-            "listen": "test",
-            "script": {
-              "exec": [
-                "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                "pm.collectionVariables.set('applicantToken', pm.response.json().token);"
-              ]
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('applicantToken', pm.response.json().token);"
+                ]
+              }
             }
-          }],
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\"email\":\"applicant@example.com\",\"password\":\"password123\"}"
@@ -51,18 +78,25 @@
         },
         {
           "name": "Login company",
-          "event": [{
-            "listen": "test",
-            "script": {
-              "exec": [
-                "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-                "pm.collectionVariables.set('companyToken', pm.response.json().token);"
-              ]
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('companyToken', pm.response.json().token);"
+                ]
+              }
             }
-          }],
+          ],
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\"email\":\"company@example.com\",\"password\":\"password123\"}"
@@ -74,7 +108,16 @@
           "name": "Get current applicant",
           "request": {
             "method": "GET",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{applicantToken}}", "type": "string" }] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{applicantToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "url": "{{baseUrl}}/api/auth/me"
           }
         }
@@ -99,19 +142,35 @@
         },
         {
           "name": "Create job",
-          "event": [{
-            "listen": "test",
-            "script": {
-              "exec": [
-                "pm.test('Status is 201', () => pm.response.to.have.status(201));",
-                "pm.collectionVariables.set('jobId', pm.response.json().id);"
-              ]
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('jobId', pm.response.json().id);"
+                ]
+              }
             }
-          }],
+          ],
           "request": {
             "method": "POST",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{companyToken}}", "type": "string" }] },
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{companyToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\"title\":\"Java Backend Developer\",\"description\":\"Build and maintain REST APIs.\",\"location\":\"Riyadh\",\"jobType\":\"FULL_TIME\",\"salaryMin\":7000,\"salaryMax\":10000,\"expiresAt\":\"2026-12-31\"}"
@@ -123,7 +182,16 @@
           "name": "Get my company jobs",
           "request": {
             "method": "GET",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{companyToken}}", "type": "string" }] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{companyToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "url": "{{baseUrl}}/api/jobs/my?page=0&size=10"
           }
         },
@@ -131,8 +199,22 @@
           "name": "Update job",
           "request": {
             "method": "PUT",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{companyToken}}", "type": "string" }] },
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{companyToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\"title\":\"Senior Java Backend Developer\",\"description\":\"Build secure REST APIs.\",\"location\":\"Riyadh\",\"jobType\":\"FULL_TIME\",\"salaryMin\":9000,\"salaryMax\":13000,\"expiresAt\":\"2026-12-31\"}"
@@ -144,7 +226,16 @@
           "name": "Deactivate job",
           "request": {
             "method": "DELETE",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{companyToken}}", "type": "string" }] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{companyToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "url": "{{baseUrl}}/api/jobs/{{jobId}}"
           }
         }
@@ -164,8 +255,22 @@
           "name": "Update my company",
           "request": {
             "method": "PUT",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{companyToken}}", "type": "string" }] },
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{companyToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\"name\":\"Acme Tech\",\"description\":\"Backend engineering company.\",\"website\":\"https://example.com\",\"logoUrl\":null,\"location\":\"Riyadh\"}"
@@ -180,20 +285,39 @@
       "item": [
         {
           "name": "Apply to job",
-          "event": [{
-            "listen": "test",
-            "script": {
-              "exec": [
-                "pm.test('Status is 201', () => pm.response.to.have.status(201));",
-                "pm.collectionVariables.set('applicationId', pm.response.json().id);"
-              ]
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('applicationId', pm.response.json().id);"
+                ]
+              }
             }
-          }],
+          ],
           "request": {
             "method": "POST",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{applicantToken}}", "type": "string" }] },
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\"coverLetter\":\"I am interested in this role.\"}" },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{applicantToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"coverLetter\":\"I am interested in this role.\"}"
+            },
             "url": "{{baseUrl}}/api/jobs/{{jobId}}/apply"
           }
         },
@@ -201,7 +325,16 @@
           "name": "Get my applications",
           "request": {
             "method": "GET",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{applicantToken}}", "type": "string" }] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{applicantToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "url": "{{baseUrl}}/api/applications/mine"
           }
         },
@@ -209,7 +342,16 @@
           "name": "Get job applicants",
           "request": {
             "method": "GET",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{companyToken}}", "type": "string" }] },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{companyToken}}",
+                  "type": "string"
+                }
+              ]
+            },
             "url": "{{baseUrl}}/api/jobs/{{jobId}}/applications"
           }
         },
@@ -217,10 +359,97 @@
           "name": "Update application status",
           "request": {
             "method": "PUT",
-            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{companyToken}}", "type": "string" }] },
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\"status\":\"REVIEWED\"}" },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{companyToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"status\":\"REVIEWED\"}"
+            },
             "url": "{{baseUrl}}/api/applications/{{applicationId}}/status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Additional workflows",
+      "item": [
+        {
+          "name": "GET /api/companies/me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/companies/me",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{companyToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/jobs/{{jobId}}/my-application",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/jobs/{{jobId}}/my-application",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{applicantToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH /api/jobs/{{jobId}}/activate",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/api/jobs/{{jobId}}/activate",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{companyToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /actuator/health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/actuator/health",
+            "auth": {
+              "type": "noauth"
+            }
           }
         }
       ]

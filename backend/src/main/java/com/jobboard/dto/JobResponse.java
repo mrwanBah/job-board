@@ -14,6 +14,7 @@ public record JobResponse(
         BigDecimal salaryMax,
         boolean isActive,
         LocalDateTime createdAt,
+        java.time.LocalDate expiresAt,
         CompanyResponse company
 ) {
 }

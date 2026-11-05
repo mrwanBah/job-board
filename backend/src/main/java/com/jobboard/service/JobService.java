@@ -44,15 +44,19 @@ public class JobService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<JobResponse> findAll(String search, JobType jobType, int page, int size) {
+    public PageResponse<JobResponse> findAll(String search, JobType jobType, Long companyId, int page, int size) {
+        validatePagination(page, size);
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Job> jobs = jobRepository.findAll(JobSpecifications.publicFilters(search, jobType), pageable);
+        Specification<Job> filters = JobSpecifications.publicFilters(search, jobType);
+        if (companyId != null) filters = filters.and(JobSpecifications.ownedByCompany(companyId));
+        Page<Job> jobs = jobRepository.findAll(filters, pageable);
 
         return toPageResponse(jobs);
     }
 
     @Transactional(readOnly = true)
     public PageResponse<JobResponse> findCurrentCompanyJobs(int page, int size) {
+        validatePagination(page, size);
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Company company = getCurrentCompany();
 
@@ -72,6 +76,8 @@ public class JobService {
     }
 
     public JobResponse create(JobRequest request) {
+        if (request.expiresAt() != null && request.expiresAt().isBefore(java.time.LocalDate.now()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Expiry date must not be in the past");
         Company company = getCurrentCompany();
 
         Job job = new Job(
@@ -109,6 +115,15 @@ public class JobService {
         jobRepository.save(job);
     }
 
+    public JobResponse activate(Long id) {
+        Job job = getCurrentCompanyJob(id);
+        if (job.isExpired()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Update the expiry date before reactivating this job");
+        job.activate();
+        return jobMapper.toResponse(jobRepository.save(job));
+    }
+    private void validatePagination(int page, int size) {
+        if (page < 0 || size < 1 || size > 50) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page must be nonnegative and size between 1 and 50");
+    }
     private Job getCurrentCompanyJob(Long id) {
         Company company = getCurrentCompany();
         Job job = jobRepository.findById(id)

@@ -43,6 +43,11 @@ public class ApplicationController {
         return applicationService.apply(id, request);
     }
 
+    @Operation(summary = "Get my application for a job")
+    @PreAuthorize("hasRole('APPLICANT')")
+    @GetMapping("/jobs/{id}/my-application")
+    public ApplicationResponse myApplication(@PathVariable Long id) { return applicationService.findMyApplication(id); }
+
     @Operation(summary = "Get my applications", description = "Returns applications submitted by the authenticated applicant.")
     @PreAuthorize("hasRole('APPLICANT')")
     @GetMapping("/applications/mine")

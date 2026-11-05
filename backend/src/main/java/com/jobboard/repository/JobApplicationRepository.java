@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.EntityGraph;
 
 public interface JobApplicationRepository extends JpaRepository<JobApplication, Long> {
+    @EntityGraph(attributePaths = {"job", "job.company", "applicant"})
+    Optional<JobApplication> findByJobIdAndApplicantId(Long jobId, Long applicantId);
     boolean existsByJobIdAndApplicantId(Long jobId, Long applicantId);
 
     @EntityGraph(attributePaths = {"job", "job.company", "applicant"})

@@ -139,6 +139,8 @@ public class Job {
         this.expiresAt = expiresAt;
     }
 
+    public void activate() { this.active = true; }
+    public boolean isExpired() { return expiresAt != null && expiresAt.isBefore(LocalDate.now()); }
     public void deactivate() {
         this.active = false;
     }

@@ -27,3 +27,9 @@ Thumbs.db
 !.vscode/extensions.json
 .idea/
 *.sw?
+
+AGENTS.md
+**/AGENTS.md
+
+test-results/
+playwright-report/

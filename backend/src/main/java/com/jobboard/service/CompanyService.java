@@ -29,6 +29,19 @@ public class CompanyService {
                 .orElseThrow(() -> new NotFoundException("Company not found")));
     }
 
+    @Transactional(readOnly = true)
+    public CompanyResponse findMine() {
+        return toResponse(companyRepository.findByUser(authService.getCurrentUser())
+                .orElseThrow(() -> new NotFoundException("Company profile not found")));
+    }
+    private void validateUrl(String value) {
+        if (value == null || value.isBlank()) return;
+        try {
+            java.net.URI uri = java.net.URI.create(value);
+            if (!("https".equalsIgnoreCase(uri.getScheme()) || "http".equalsIgnoreCase(uri.getScheme())) || uri.getHost() == null)
+                throw new IllegalArgumentException();
+        } catch (IllegalArgumentException ex) { throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Website and logo must be valid http/https URLs"); }
+    }
     public CompanyResponse updateMine(CompanyUpdateRequest request) {
         User user = authService.getCurrentUser();
         if (user.getRole() != Role.COMPANY) {
@@ -37,6 +50,8 @@ public class CompanyService {
 
         Company company = companyRepository.findByUser(user)
                 .orElseThrow(() -> new NotFoundException("Company profile not found"));
+        validateUrl(request.website());
+        validateUrl(request.logoUrl());
         company.update(request.name(), request.description(), request.website(), request.logoUrl(), request.location());
         return toResponse(companyRepository.save(company));
     }

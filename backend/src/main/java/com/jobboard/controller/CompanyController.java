@@ -34,6 +34,12 @@ public class CompanyController {
         return companyService.findById(id);
     }
 
+    @Operation(summary = "Get current company profile")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('COMPANY')")
+    @GetMapping("/me")
+    public CompanyResponse myCompany() { return companyService.findMine(); }
+
     @Operation(summary = "Update current company profile", description = "Updates the profile owned by the authenticated company user.")
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('COMPANY')")

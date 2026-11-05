@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { usePageTitle } from '../hooks/usePageTitle'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import FilterBar from '../components/FilterBar'
 import JobCard from '../components/JobCard'
 import Spinner from '../components/Spinner'
@@ -6,24 +8,29 @@ import { useJobs } from '../hooks/useJobs'
 import type { JobType } from '../types'
 
 export default function HomePage() {
-  const [search, setSearch] = useState('')
-  const [jobType, setJobType] = useState<JobType | ''>('')
-  const [page, setPage] = useState(0)
+  usePageTitle('Find jobs')
+  const [params, setParams] = useSearchParams()
+  const search = params.get('search') ?? ''
+  const rawType = params.get('jobType') ?? ''
+  const jobType = (['FULL_TIME', 'PART_TIME', 'CONTRACT', 'INTERNSHIP'].includes(rawType) ? rawType : '') as JobType | ''
+  const rawPage = Number(params.get('page') ?? 0)
+  const page = Number.isSafeInteger(rawPage) && rawPage >= 0 ? rawPage : 0
+  const [debounced, setDebounced] = useState(search)
+  useEffect(() => { const timer = setTimeout(() => setDebounced(search), 300); return () => clearTimeout(timer) }, [search])
+  const setPage = (update: (page: number) => number) => setParams(p => { p.set('page', String(update(page))); return p })
 
   const { data, isPending, isError, isFetching } = useJobs({
-    search: search || undefined,
+    search: debounced || undefined,
     jobType: jobType || undefined,
     page,
     size: 10,
   })
 
   const onSearchChange = (value: string) => {
-    setSearch(value)
-    setPage(0)
+    setParams(p => { if (value) p.set('search', value); else p.delete('search'); p.delete('page'); return p }, { replace: true })
   }
   const onJobTypeChange = (value: JobType | '') => {
-    setJobType(value)
-    setPage(0)
+    setParams(p => { if (value) p.set('jobType', value); else p.delete('jobType'); p.delete('page'); return p })
   }
 
   const jobs = data?.content ?? []
@@ -43,11 +50,12 @@ export default function HomePage() {
         />
       </div>
 
+      <p aria-live="polite" className="mt-4 text-sm text-gray-600">{data ? `${data.totalElements} results` : 'Searching…'}</p>
       <div className="mt-6">
         {isPending ? (
           <Spinner label="Loading jobs…" />
         ) : isError ? (
-          <p className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+          <p aria-live="polite" className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
             Couldn’t load jobs. Make sure the API is running, then try again.
           </p>
         ) : jobs.length === 0 ? (
