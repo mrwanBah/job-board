@@ -92,6 +92,9 @@ jobs:
       - name: Verify complete browser workflow
         working-directory: frontend
         run: npm run test:e2e
+      - name: Verify Postman collection
+        working-directory: frontend
+        run: npm exec --yes --package=newman@6.2.1 -- newman run ../postman/Job-Board-API.postman_collection.json
       - name: Capture container logs
         if: always()
         run: docker compose logs --no-color > container-logs.txt
