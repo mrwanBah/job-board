@@ -31,6 +31,7 @@ export const jobsApi = {
     const { data } = await api.put<Job>(`/jobs/${id}`, payload)
     return data
   },
+  activate: async (id: number | string): Promise<Job> => { const { data } = await api.patch<Job>(`/jobs/${id}/activate`); return data },
   deactivate: async (id: number | string): Promise<void> => {
     await api.delete(`/jobs/${id}`)
   },

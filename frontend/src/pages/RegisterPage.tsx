@@ -1,6 +1,8 @@
+import { usePageTitle } from '../hooks/usePageTitle'
+import { setApiFieldErrors } from '../utils/formErrors'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { useForm, useWatch } from 'react-hook-form'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { authApi } from '../api/authApi'
 import { useAuthStore } from '../stores/authStore'
 import { apiErrorMessage } from '../utils/apiError'
@@ -10,16 +12,20 @@ const inputClass =
   'mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
 
 export default function RegisterPage() {
+  usePageTitle('Create account')
   const navigate = useNavigate()
+  const location = useLocation()
+  const token = useAuthStore(s => s.token)
   const setAuth = useAuthStore((s) => s.setAuth)
   const [serverError, setServerError] = useState<string | null>(null)
   const {
     register,
+    setError,
     handleSubmit,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<RegisterRequest>({ defaultValues: { role: 'APPLICANT' } })
-  const role = watch('role')
+  const role = useWatch({ control, name: 'role' })
   const isCompany = role === 'COMPANY'
 
   const onSubmit = async (values: RegisterRequest) => {
@@ -27,11 +33,14 @@ export default function RegisterPage() {
     try {
       const { token, user } = await authApi.register(values)
       setAuth(token, user)
-      navigate('/dashboard')
+      navigate(typeof location.state?.from === 'string' && location.state.from.startsWith('/') && !location.state.from.startsWith('//') ? location.state.from : '/dashboard', { replace: true })
     } catch (e) {
+      setApiFieldErrors(e, setError)
       setServerError(apiErrorMessage(e, 'Could not create account. Try a different email.'))
     }
   }
+
+  if (token) return <Navigate to="/dashboard" replace />
 
   return (
     <div className="mx-auto max-w-md px-4 py-12">
@@ -42,24 +51,25 @@ export default function RegisterPage() {
         noValidate
       >
         {serverError && (
-          <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{serverError}</p>
+          <p aria-live="polite" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{serverError}</p>
         )}
         <div>
-          <label className="block text-sm font-medium text-gray-700">I am a</label>
-          <select className={inputClass} {...register('role', { required: true })}>
+          <label htmlFor="role" className="block text-sm font-medium text-gray-700">I am a</label>
+          <select id="role" className={inputClass} {...register('role', { required: true })}>
             <option value="APPLICANT">Applicant — looking for jobs</option>
             <option value="COMPANY">Company — hiring</option>
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
             {isCompany ? 'Company name' : 'Full name'}
           </label>
-          <input
+          <input id="fullName"
             className={inputClass}
             placeholder={isCompany ? 'e.g. Acme Corp' : undefined}
             {...register('fullName', {
               required: isCompany ? 'Company name is required' : 'Full name is required',
+              maxLength: { value: 255, message: 'At most 255 characters' },
             })}
           />
           {isCompany && (
@@ -68,33 +78,36 @@ export default function RegisterPage() {
             </p>
           )}
           {errors.fullName && (
-            <p className="mt-1 text-xs text-red-600">{errors.fullName.message}</p>
+            <p aria-live="polite" className="mt-1 text-xs text-red-600">{errors.fullName.message}</p>
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Email</label>
-          <input
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+          <input id="email"
             type="email"
             className={inputClass}
             {...register('email', {
               required: 'Email is required',
+              maxLength: { value: 255, message: 'At most 255 characters' },
+              setValueAs: (v: string) => v.trim(),
               pattern: { value: /^[^@\s]+@[^@\s]+\.[^@\s]+$/, message: 'Enter a valid email' },
             })}
           />
-          {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
+          {errors.email && <p aria-live="polite" className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Password</label>
-          <input
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+          <input id="password"
             type="password"
             className={inputClass}
             {...register('password', {
               required: 'Password is required',
               minLength: { value: 8, message: 'At least 8 characters' },
+              maxLength: { value: 72, message: 'At most 72 characters' },
             })}
           />
           {errors.password && (
-            <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>
+            <p aria-live="polite" className="mt-1 text-xs text-red-600">{errors.password.message}</p>
           )}
         </div>
         <button

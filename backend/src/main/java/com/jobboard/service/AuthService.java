@@ -35,13 +35,18 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.email())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email is already registered");
+        if (request.role() != Role.APPLICANT && request.role() != Role.COMPANY) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only APPLICANT and COMPANY registration is allowed");
+        }
+        String email = request.email().trim().toLowerCase(java.util.Locale.ROOT);
+        if (userRepository.existsByEmail(email)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already registered");
         }
 
         User user = new User(
-                request.email(),
+                email,
                 passwordEncoder.encode(request.password()),
                 request.fullName(),
                 request.role()
@@ -56,7 +61,7 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
+        User user = userRepository.findByEmail(request.email().trim().toLowerCase(java.util.Locale.ROOT))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
 
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
@@ -77,7 +82,7 @@ public class AuthService {
     }
 
     private AuthResponse toAuthResponse(User user) {
-        return new AuthResponse(jwtUtil.generateToken(user.getEmail()), toUserResponse(user));
+        return new AuthResponse(jwtUtil.generateToken(user.getEmail(), user.getRole().name()), toUserResponse(user));
     }
 
     private UserResponse toUserResponse(User user) {

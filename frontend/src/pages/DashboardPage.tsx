@@ -1,3 +1,4 @@
+import { usePageTitle } from '../hooks/usePageTitle'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 
@@ -5,6 +6,7 @@ const cardClass =
   'rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition hover:border-indigo-300 hover:shadow-md'
 
 export default function DashboardPage() {
+  usePageTitle('Dashboard')
   const user = useAuthStore((s) => s.user)
   const isCompany = user?.role === 'COMPANY'
 

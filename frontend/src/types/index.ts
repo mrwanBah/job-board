@@ -25,11 +25,12 @@ export interface Job {
   id: number
   title: string
   description: string
-  location: string
+  location: string | null
   jobType: JobType
   salaryMin?: number | null
   salaryMax?: number | null
   isActive: boolean
+  expiresAt?: string | null
   createdAt: string
   company: Company
 }

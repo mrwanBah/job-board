@@ -1,18 +1,17 @@
 package com.jobboard.dto;
-
 import com.jobboard.model.JobType;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
 public record JobRequest(
-        @NotBlank String title,
-        @NotBlank String description,
-        String location,
-        @NotNull JobType jobType,
-        BigDecimal salaryMin,
-        BigDecimal salaryMax,
-        LocalDate expiresAt
+    @NotBlank @Size(max=255) String title,
+    @NotBlank @Size(max=10000) String description,
+    @Size(max=255) String location,
+    @NotNull JobType jobType,
+    @PositiveOrZero @Digits(integer=8, fraction=2) BigDecimal salaryMin,
+    @PositiveOrZero @Digits(integer=8, fraction=2) BigDecimal salaryMax,
+    LocalDate expiresAt
 ) {
+    @AssertTrue(message="Minimum salary must not exceed maximum salary")
+    public boolean isSalaryRangeValid() { return salaryMin == null || salaryMax == null || salaryMin.compareTo(salaryMax) <= 0; }
 }

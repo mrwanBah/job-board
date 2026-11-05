@@ -1,3 +1,4 @@
+import { salaryLabel, safeHttpUrl } from '../utils/jobs'
 import { Link } from 'react-router-dom'
 import type { Job } from '../types'
 import { JOB_TYPE_LABELS } from '../utils/jobTypes'
@@ -10,6 +11,7 @@ export default function JobCard({ job }: { job: Job }) {
     >
       <div className="flex items-start justify-between gap-3">
         <div>
+          {safeHttpUrl(job.company.logoUrl) && <img src={safeHttpUrl(job.company.logoUrl)} alt={job.company.name + ' logo'} className="mb-2 h-10 w-10 object-contain" />}
           <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
           <p className="text-sm text-gray-600">{job.company.name}</p>
         </div>
@@ -19,12 +21,8 @@ export default function JobCard({ job }: { job: Job }) {
       </div>
       <p className="mt-3 line-clamp-2 text-sm text-gray-600">{job.description}</p>
       <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
-        <span>{job.location}</span>
-        {job.salaryMin != null && job.salaryMax != null && (
-          <span>
-            {job.salaryMin.toLocaleString()}–{job.salaryMax.toLocaleString()} SAR
-          </span>
-        )}
+        <span>{job.location || 'Location not specified'}</span>
+        {salaryLabel(job) && <span>{salaryLabel(job)}</span>}
       </div>
     </Link>
   )
