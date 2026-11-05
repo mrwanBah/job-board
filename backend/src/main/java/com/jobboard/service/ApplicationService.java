@@ -47,7 +47,7 @@ public class ApplicationService {
         Job job = jobRepository.findById(jobId)
                 .orElseThrow(() -> new NotFoundException("Job not found"));
 
-        if (!job.isActive()) {
+        if (!job.isActive() || job.isExpired()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This job is no longer accepting applications");
         }
         if (applicationRepository.existsByJobIdAndApplicantId(jobId, applicant.getId())) {
@@ -58,6 +58,12 @@ public class ApplicationService {
         return applicationMapper.toResponse(applicationRepository.save(application));
     }
 
+    @Transactional(readOnly = true)
+    public ApplicationResponse findMyApplication(Long jobId) {
+        User user = requireApplicant();
+        return applicationMapper.toResponse(applicationRepository.findByJobIdAndApplicantId(jobId, user.getId())
+                .orElseThrow(() -> new NotFoundException("No application for this job")));
+    }
     @Transactional(readOnly = true)
     public List<ApplicationResponse> findMine() {
         User applicant = requireApplicant();

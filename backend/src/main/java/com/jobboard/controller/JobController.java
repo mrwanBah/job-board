@@ -40,12 +40,13 @@ public class JobController {
             @RequestParam(required = false) String search,
             @Parameter(description = "Filter by job type")
             @RequestParam(required = false) JobType jobType,
+            @RequestParam(required = false) Long companyId,
             @Parameter(description = "Zero-based page number")
             @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Page size")
             @RequestParam(defaultValue = "10") int size
     ) {
-        return jobService.findAll(search, jobType, page, size);
+        return jobService.findAll(search, jobType, companyId, page, size);
     }
 
     @Operation(summary = "Get job details", description = "Public job details including the company profile.")
@@ -82,6 +83,12 @@ public class JobController {
     public void deleteJob(@Parameter(description = "Job id") @PathVariable Long id) {
         jobService.delete(id);
     }
+
+    @Operation(summary = "Reactivate an owned job")
+    @SecurityRequirement(name = "bearerAuth")
+    @PreAuthorize("hasRole('COMPANY')")
+    @org.springframework.web.bind.annotation.PatchMapping("/{id}/activate")
+    public JobResponse activate(@PathVariable Long id) { return jobService.activate(id); }
 
     @Operation(summary = "Get current company's jobs", description = "Returns active jobs owned by the authenticated company.")
     @SecurityRequirement(name = "bearerAuth")

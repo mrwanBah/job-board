@@ -12,9 +12,13 @@ public record CompanyUpdateRequest(
         String description,
 
         @Size(max = 255, message = "Website must not exceed 255 characters")
+        @org.hibernate.validator.constraints.URL
+        @jakarta.validation.constraints.Pattern(regexp = "(?i)^(https?://\\S+)?$", message = "Use a valid http/https URL")
         String website,
 
         @Size(max = 500, message = "Logo URL must not exceed 500 characters")
+        @org.hibernate.validator.constraints.URL
+        @jakarta.validation.constraints.Pattern(regexp = "(?i)^(https?://\\S+)?$", message = "Use a valid http/https URL")
         String logoUrl,
 
         @Size(max = 255, message = "Location must not exceed 255 characters")

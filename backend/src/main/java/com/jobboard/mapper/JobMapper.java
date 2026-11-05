@@ -30,6 +30,7 @@ public class JobMapper {
                 job.getSalaryMax(),
                 job.isActive(),
                 job.getCreatedAt(),
+                job.getExpiresAt(),
                 companyResponse
         );
     }

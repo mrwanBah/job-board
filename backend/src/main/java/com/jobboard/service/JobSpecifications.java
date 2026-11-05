@@ -9,7 +9,7 @@ public final class JobSpecifications {
     }
 
     public static Specification<Job> active() {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.isTrue(root.get("active"));
+        return (root, query, criteriaBuilder) -> criteriaBuilder.and(criteriaBuilder.isTrue(root.get("active")), criteriaBuilder.or(criteriaBuilder.isNull(root.get("expiresAt")), criteriaBuilder.greaterThanOrEqualTo(root.get("expiresAt"), java.time.LocalDate.now())));
     }
 
     public static Specification<Job> ownedByCompany(Long companyId) {
